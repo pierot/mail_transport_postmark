@@ -1,3 +1,5 @@
+FORKED: Added support for attachments.
+
 Postmarkapp is a "email delivery in the cloud" service for sending out transactional emails in your applications. By using this service you don't need to worry about the setup and maintenance of a mailserver and as Postmarkapp is built to scale it can easily deal with large bursts of messages. Whilst an easy-to-use API is available this Zend_Mail transport allows you to easily switch out and use Postmark for mail delivery.
 
 Usage is as simple as:

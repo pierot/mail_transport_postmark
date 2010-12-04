@@ -4,9 +4,9 @@
  *
  * Copyright 2010, Alistair Phillips, http://the.0gravity.co.uk/universe/php/zend/mail_transport_postmark/
  *
- * @author Alistair Phillips (alistair@0gravity.co.uk)
+ * @author Pieter Michels (pieter@wellconsidered.be)
  * @copyright Copyright 2010, Alistair Phillips
- * @version 0.2
+ * @version 0.3
  *
  */
  
@@ -92,27 +92,27 @@ class Mail_Transport_Postmark extends Zend_Mail_Transport_Abstract
             }
             reset($headers['Reply-To']);
         }
-	
-	    $tags = array();
-        if (array_key_exists('postmark-tag', $headers)) {
-            reset($headers['postmark-tag']);
-            foreach ($headers['postmark-tag'] as $key => $val) {
-                if (empty($key) || $key != 'append')
-                {
-                    $tags[] = $val;
-                }
-            }
-            reset($headers['postmark-tag']);
-        }
+
+				$attachments = array();
+				
+				if($this->_mail->hasAttachments) {
+					$parts = $this->_mail->getParts();
+
+					foreach($parts as $part) {
+						array_push($attachments, array(	'Name' => $part->filename, 
+																							'Content' => $part->getContent(), 
+																							'ContentType' => $part->type));
+					}
+				}
         
         $postData = array(
-            'From'     => implode( ',', $from ),
-            'To'       => implode( ',', $to ),
-            'Cc'       => implode( ',', $cc ),
-            'Bcc'      => implode( ',', $bcc),
-            'Subject'  => $this->_mail->getSubject(),
-            'ReplyTo'  => implode( ',', $replyto ),
-            'tag'      => implode(',', $tags)
+            'From'     		=> implode( ',', $from ),
+            'To'       		=> implode( ',', $to ),
+            'Cc'       		=> implode( ',', $cc ),
+            'Bcc'      		=> implode( ',', $bcc),
+            'Subject'  		=> $this->_mail->getSubject(),
+            'ReplyTo'  		=> implode( ',', $replyto ),
+						'Attachments'	=> $attachments, 
         );
         
         // We first check if the relevant content exists (returned as a Zend_Mime_Part)
@@ -138,7 +138,7 @@ class Mail_Transport_Postmark extends Zend_Mail_Transport_Abstract
         ));
         $client->setRawData( json_encode( $postData ), 'application/json' );
         $response = $client->request();
-        
+
         if ( $response->getStatus() != 200 ) {
             throw new Exception( 'Mail not sent - Postmark returned ' . $response->getStatus() . ' - ' . $response->getMessage() );
         }
