@@ -134,6 +134,7 @@ class Mail_Transport_Postmark extends Zend_Mail_Transport_Abstract
         $client->setMethod( Zend_Http_Client::POST );
         $client->setHeaders( array(
             'Accept' => 'application/json',
+						'Content-Type' => 'application/json',
             'X-Postmark-Server-Token' => $this->_apiKey
         ));
         $client->setRawData( json_encode( $postData ), 'application/json' );
